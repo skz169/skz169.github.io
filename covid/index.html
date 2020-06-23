@@ -34,10 +34,10 @@
 <div id='map'></div>
 
 <script>
-    var tiles = L.tileLayer('http://tile{s}.maps.2gis.com/tiles?x={x}&y={y}&z={z}&r=g&ts=online_hd', {
+    var tiles = L.tileLayer('https://tile{s}.maps.2gis.com/tiles?x={x}&y={y}&z={z}&r=g&ts=online_hd', {
         subdomains: '0123',
         maxZoom: 18,
-        errorTileUrl: 'http://maps.api.2gis.ru/images/nomap.png',
+        errorTileUrl: 'https://maps.api.2gis.ru/images/nomap.png',
         attribution: '<a href="https://law.2gis.ru/" title="Картографические данные" target="_blank">2GIS</a> | <a href="http://www.openstreetmap.org/copyright" title="Картографические данные" target="_blank">OpenStreetMap</a>'
     }),
 
