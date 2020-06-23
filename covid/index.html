@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Карта Covid-19 в Свердловской области</title>
+
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css" integrity="sha384-eS4bw6aEvhCSXWGP85ANR/N8isWKzT7P36NvcuTJGkrj6wsbxLVpXslrNXYHyseD" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js" integrity="sha384-wKOriz2x8/bF1D9t6PuKhSpxfhHeVi9huvyuxJrrShSJpi5+rmRIsM90UuWbdAYJ" crossorigin=""></script>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" integrity="sha384-lPzjPsFQL6te2x+VxmV6q1DpRxpRk0tmnl2cpwAO5y04ESyc752tnEWPKDfl1olr" crossorigin="" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" integrity="sha384-5kMSQJ6S4Qj5i09mtMNrWpSi8iXw230pKU76xTmrpezGnNJQzj0NzXjQLLg+jE7k" crossorigin="" />
+    <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js" integrity="sha384-RLIyj5q1b5XJTn0tqUhucRZe40nFTocRP91R/NkRJHwAe4XxnTV77FXy/vGLiec2" crossorigin=""></script>
+
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+
+</head>
+<body>
+
+<div id='map'></div>
+
+<script>
+    var tiles = L.tileLayer('http://tile{s}.maps.2gis.com/tiles?x={x}&y={y}&z={z}&r=g&ts=online_hd', {
+        subdomains: '0123',
+        maxZoom: 18,
+        errorTileUrl: 'http://maps.api.2gis.ru/images/nomap.png',
+        attribution: '<a href="https://law.2gis.ru/" title="Картографические данные" target="_blank">2GIS</a> | <a href="http://www.openstreetmap.org/copyright" title="Картографические данные" target="_blank">OpenStreetMap</a>'
+    }),
+
+    latLng = L.latLng(56.8, 60.6);
+
+    var map = L.map('map', {
+        center: latLng,
+        zoom: 10,
+        layers: [tiles],
+        zoomAnimation: false,
+    });
+
+    fetch('covid.json')
+        .then(response => response.json())
+        .then(data => {
+            var geoJsonLayer = L.geoJson(data)
+            var markers = L.markerClusterGroup({
+                showCoverageOnHover: false,
+                animate: false,
+            });
+            markers.addLayer(geoJsonLayer);
+            map.addLayer(markers);
+        });
+</script>
+
+</body>
+</html>
