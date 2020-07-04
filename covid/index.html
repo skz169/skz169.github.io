@@ -50,7 +50,7 @@
         zoomAnimation: false,
     });
 
-    fetch('covid.json')
+    fetch('data/covid.json')
         .then(response => response.json())
         .then(data => {
             var geoJsonLayer = L.geoJson(data)
