@@ -61,6 +61,17 @@
                 markers.addLayer(geoJsonLayer);
                 map.addLayer(markers);
             });
+
+        fetch('data/updated')
+            .then(response => response.text())
+            .then(data => {
+                var updated = new Date(data*1000);
+                var updatedElement = document.createElement('div');
+                updatedElement.classList.add('leaflet-control-attribution', 'leaflet-control');
+                updatedElement.innerText = updated.toLocaleDateString();
+                updatedElement.setAttribute('title', updated.toLocaleTimeString());
+                document.querySelector('.leaflet-bottom.leaflet-left').appendChild(updatedElement);
+            });
     </script>
 
     <script type="text/javascript" >
