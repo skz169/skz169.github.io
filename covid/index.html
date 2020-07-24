@@ -31,61 +31,71 @@
 </head>
 <body>
 
-<div id='map'></div>
+    <div id='map'></div>
 
-<script>
-    var tiles = L.tileLayer('https://tile{s}.maps.2gis.com/tiles?x={x}&y={y}&z={z}&r=g&ts=online_hd', {
-        subdomains: '0123',
-        maxZoom: 18,
-        errorTileUrl: 'https://maps.api.2gis.ru/images/nomap.png',
-        attribution: '<a href="https://law.2gis.ru/" title="Картографические данные" target="_blank">2GIS</a> | <a href="http://www.openstreetmap.org/copyright" title="Картографические данные" target="_blank">OpenStreetMap</a> | <a href="http://www.66.rospotrebnadzor.ru/" title="Данные по COVID-19">Роспотребнадзор</a>'
-    }),
+    <script>
+        var tiles = L.tileLayer('https://tile{s}.maps.2gis.com/tiles?x={x}&y={y}&z={z}&r=g&ts=online_hd', {
+            subdomains: '0123',
+            maxZoom: 18,
+            errorTileUrl: 'https://maps.api.2gis.ru/images/nomap.png',
+            attribution: '<a href="https://law.2gis.ru/" title="Картографические данные" target="_blank">2GIS</a> | <a href="http://www.openstreetmap.org/copyright" title="Картографические данные" target="_blank">OpenStreetMap</a> | <a href="http://www.66.rospotrebnadzor.ru/" title="Данные по COVID-19">Роспотребнадзор</a>'
+        }),
 
-    latLng = L.latLng(56.8, 60.6);
+        latLng = L.latLng(56.8, 60.6);
 
-    var map = L.map('map', {
-        center: latLng,
-        zoom: 10,
-        layers: [tiles],
-        zoomAnimation: false,
-    });
+        var map = L.map('map', {
+            center: latLng,
+            zoom: 10,
+            layers: [tiles],
+            zoomAnimation: false,
+        });
 
-    fetch('data/covid.json')
-        .then(response => response.json())
-        .then(data => {
-            var geoJsonLayer = L.geoJson(data)
+        async function fetchData() {
+            var updated_url = 'data/updated';
+            var updated_res = await (await fetch(updated_url)).text();
+            
+            if (!Number.parseInt(updated_res)) {
+                throw 'Error while fetch '+updated_url;
+            }
+
+            var updated = new Date(updated_res*1000);
+            var updatedElement = document.createElement('div');
+            updatedElement.classList.add('leaflet-control-attribution', 'leaflet-control');
+            updatedElement.innerText = updated.toLocaleDateString();
+            updatedElement.setAttribute('title', updated.toLocaleTimeString());
+            document.querySelector('.leaflet-bottom.leaflet-left').appendChild(updatedElement);
+
+            var geojson_url = 'data/'+updated.toISOString().substr(0, 10)+'.json';
+            var geojson_res = await (await fetch(geojson_url)).json();
+
+            if (!typeof geojson_res === 'object') {
+                throw 'Error while fetch '+geojson_url;
+            }
+
+            var geoJsonLayer = L.geoJson(geojson_res)
             var markers = L.markerClusterGroup({
                 showCoverageOnHover: false,
                 animate: false,
             });
             markers.addLayer(geoJsonLayer);
             map.addLayer(markers);
-        });
+        }
 
-    fetch('data/updated')
-        .then(response => response.text())
-        .then(data => {
-            var updated = new Date(data*1000);
-            var updatedElement = document.createElement('div');
-            updatedElement.classList.add('leaflet-control-attribution', 'leaflet-control');
-            updatedElement.innerText = updated.toLocaleDateString();
-            updatedElement.setAttribute('title', updated.toLocaleTimeString());
-            document.querySelector('.leaflet-bottom.leaflet-left').appendChild(updatedElement);
-        });
-</script>
+        fetchData();
+    </script>
 
-<script type="text/javascript" >
-    (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
-    m[i].l=1*new Date();k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
-    (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
- 
-    ym(65121754, "init", {
-         clickmap:true,
-         trackLinks:true,
-         accurateTrackBounce:true
-    });
- </script>
- <noscript><div><img src="https://mc.yandex.ru/watch/65121754" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+    <script type="text/javascript" >
+        (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+        m[i].l=1*new Date();k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
+        (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+    
+        ym(65121754, "init", {
+            clickmap:true,
+            trackLinks:true,
+            accurateTrackBounce:true
+        });
+    </script>
+    <noscript><div><img src="https://mc.yandex.ru/watch/65121754" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
 
 </body>
 </html>

@@ -50,28 +50,38 @@
             zoomAnimation: false,
         });
 
-        fetch('data/covid.json')
-            .then(response => response.json())
-            .then(data => {
-                var geoJsonLayer = L.geoJson(data)
-                var markers = L.markerClusterGroup({
-                    showCoverageOnHover: false,
-                    animate: false,
-                });
-                markers.addLayer(geoJsonLayer);
-                map.addLayer(markers);
-            });
+        async function fetchData() {
+            var updated_url = 'data/updated';
+            var updated_res = await (await fetch(updated_url)).text();
+            
+            if (!Number.parseInt(updated_res)) {
+                throw 'Error while fetch '+updated_url;
+            }
 
-        fetch('data/updated')
-            .then(response => response.text())
-            .then(data => {
-                var updated = new Date(data*1000);
-                var updatedElement = document.createElement('div');
-                updatedElement.classList.add('leaflet-control-attribution', 'leaflet-control');
-                updatedElement.innerText = updated.toLocaleDateString();
-                updatedElement.setAttribute('title', updated.toLocaleTimeString());
-                document.querySelector('.leaflet-bottom.leaflet-left').appendChild(updatedElement);
+            var updated = new Date(updated_res*1000);
+            var updatedElement = document.createElement('div');
+            updatedElement.classList.add('leaflet-control-attribution', 'leaflet-control');
+            updatedElement.innerText = updated.toLocaleDateString();
+            updatedElement.setAttribute('title', updated.toLocaleTimeString());
+            document.querySelector('.leaflet-bottom.leaflet-left').appendChild(updatedElement);
+
+            var geojson_url = 'data/'+updated.toISOString().substr(0, 10)+'.json';
+            var geojson_res = await (await fetch(geojson_url)).json();
+
+            if (!typeof geojson_res === 'object') {
+                throw 'Error while fetch '+geojson_url;
+            }
+
+            var geoJsonLayer = L.geoJson(geojson_res)
+            var markers = L.markerClusterGroup({
+                showCoverageOnHover: false,
+                animate: false,
             });
+            markers.addLayer(geoJsonLayer);
+            map.addLayer(markers);
+        }
+
+        fetchData();
     </script>
 
     <script type="text/javascript" >
