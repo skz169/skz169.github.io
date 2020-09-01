@@ -44,7 +44,7 @@
         });
 
         var customMarkers = {
-            7480: { 'icon': greenIcon, 'title': 'По данным жильцов, в доме заболевших нет' }
+            '59.884311,56.802736': { 'icon': greenIcon, 'title': 'По данным жильцов, в доме заболевших нет' }
         };
 
         var tiles = L.tileLayer('https://tile{s}.maps.2gis.com/tiles?x={x}&y={y}&z={z}&r=g&ts=online_hd', {
@@ -89,10 +89,12 @@
 
             for (var id in geoJsonLayer._layers) {
                 var f = geoJsonLayer._layers[id];
+                var k = f.feature.geometry.coordinates.toString();
                 f.options.title = f.feature.id.toString();
-                if (customMarkers[f.feature.id]) {
-                    geoJsonLayer._layers[id].options.icon = customMarkers[f.feature.id].icon;
-                    geoJsonLayer._layers[id].options.title += ' ' + customMarkers[f.feature.id].title;
+                
+                if (customMarkers[k]) {
+                    geoJsonLayer._layers[id].options.icon = customMarkers[k].icon;
+                    geoJsonLayer._layers[id].options.title += ' ' + customMarkers[k].title;
                 }
             }
 
